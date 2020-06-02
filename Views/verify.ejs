@@ -1,0 +1,32 @@
+<%- include('partials/header.ejs') %>
+
+<body style="text-align: center;">
+
+    <%- include('partials/navbar.ejs') %>
+
+    <div class="container mt-2">
+
+        <%- include('partials/errormsg.ejs') %>
+
+        <h2 class="mt-5">Por favor, verifique seu email</h2>
+        
+        
+            
+        <form action='/verify' method="POST">
+            <label for="email" style="float: left;">Email</label>
+            <input name="email" type="text" value="<%= email %>" class="form-control" readonly><br>
+
+            <label for="token" style="float: left;">Token</label>
+            <input name="token" type="text" class="form-control" placeholder="Token generated" required>
+            <button type="submit" style="background-color: #663A91; color: white;" class="btn m-3">Verify</button>
+        </form>
+            
+
+   
+
+    </div>
+    
+
+</body>
+
+<%- include('partials/footer.ejs') %>

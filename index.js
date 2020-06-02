@@ -2,7 +2,10 @@
 const express = require('express')
 const app = express()
 const BodyParser = require('body-parser')
+
 const bcrypt = require('bcryptjs')
+const randomstring = require('randomstring') // gerar token aleatorio
+//https://github.com/klughammer/node-randomstring
 
 // sessao e autenticacao
     const passport = require('passport') // pacote de autenticacao
@@ -11,9 +14,9 @@ const bcrypt = require('bcryptjs')
     const flash = require('express-flash') // mostrar mensagem de erro flash
 
 // esta autenticado? 
-    const {checkAuthenticated, checkisNotAuthenticated} = require('./Control/isAuth')
+    const {checkAuthenticated, checkisNotAuthenticated} = require('./Control/helpers')
 // database
-    const connection = require('./Control/database')
+    const connection = require('./Control/configs/database')
     const User = require('./Model/User')
 
 // config
@@ -88,6 +91,11 @@ app.get('/login', checkisNotAuthenticated,(req, res) => {
     res.render('login')
 })
 
+app.get('/verify/:email', (req, res) => {
+    var email = req.params.email
+    res.render('verify', {email})
+})
+
 
 app.post('/register', (req, res) => {
 
@@ -111,17 +119,15 @@ app.post('/register', (req, res) => {
             var salt = bcrypt.genSaltSync(10)
             var hash = bcrypt.hashSync(password, salt)
 
+            const secretToken = randomstring.generate()
+
             User.create({
                 email:email,
-                password: hash
+                password: hash,
+                secretToken: secretToken
             }).then( () => {
 
-                passport.authenticate('local', {
-                    successRedirect: '/',
-                    failureRedirect: '/login',
-                    failureFlash: true
-                })(req, res, next)
-                
+                res.redirect('/verify/' + email)
 
             }).catch( (err) => {
                 console.log('err')
@@ -137,6 +143,43 @@ app.post('/register', (req, res) => {
         console.log(err)
     })
 
+})
+
+
+app.post('/verify', (req, res) => {
+
+    var {email, token} = req.body
+
+    User.findOne({where: {email: email}}).then( (user) => {
+
+        if(user!= undefined) {
+
+            if (user.secretToken === token) {
+
+                User.update(
+                    {confirmed: true,
+                     secretToken: "",
+                    },
+                    {where: {email: user.email}}
+                ).then( () => {
+                    req.flash('success_msg', 'Email verificado com sucesso, Agora voce pode logar!')
+                    res.redirect('/login')
+                }).catch( err => {
+                    req.flash('error_msg', 'erro interno ' + err)
+                })
+                
+            } else {
+                req.flash('error_msg', 'Token inválido.')
+                res.redirect('/verify/' + user.email)
+            }
+
+        } else {
+            req.flash('error_msg', 'esta conta nao existe')
+            res.redirect('/register')
+        }
+
+    })
+    
 })
 
 

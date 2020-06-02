@@ -2,6 +2,8 @@ const LocalStragery = require('passport-local').Strategy
 const bcrypt = require('bcryptjs')
 const User = require('../Model/User')
 
+const {checkConfirmEmail} = require('./helpers')
+
 function initialize(passport) {
 
     passport.use(new LocalStragery({ usernameField: 'email'}, (email, password, done) => {
@@ -22,7 +24,15 @@ function initialize(passport) {
 
                 // se as senhas forem iguais...
                 if(match){
-                    return done(null, user)
+
+                    var isChecked = checkConfirmEmail(user)
+
+                    if(isChecked){
+                        return done(null, user)
+                    } else {
+                        return done(null, false, {message: 'Por favor, Confirme seu email para logar', email: user.email})
+                    }
+                    
                 } else {
                     return done(null, false, {message: 'senha incorreta'})
                 }
