@@ -10,11 +10,13 @@ const randomstring = require('randomstring') // gerar token aleatorio
 // sessao e autenticacao
     const passport = require('passport') // pacote de autenticacao
     const session = require('express-session') // Carregar o modulo de sessions para guardar o usuario que esta logado
-    require('./Control/passport-config')(passport) // passar o passport para o arquivo passport-config
+    require('./Control/configs/passport-config')(passport) // passar o passport para o arquivo passport-config
     const flash = require('express-flash') // mostrar mensagem de erro flash
 
-// esta autenticado? 
+// helpers
     const {checkAuthenticated, checkisNotAuthenticated} = require('./Control/helpers')
+
+
 // database
     const connection = require('./Control/configs/database')
     const User = require('./Model/User')
@@ -126,6 +128,8 @@ app.post('/register', (req, res) => {
                 password: hash,
                 secretToken: secretToken
             }).then( () => {
+                
+                const mandou = require('./Control/configs/mailer')(email, secretToken)
 
                 res.redirect('/verify/' + email)
 
