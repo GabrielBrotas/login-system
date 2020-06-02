@@ -7,11 +7,7 @@
     <div  class="container">
 
         
-            <% if(messages.error) { %>
-                <div class="alert alert-danger">
-                    <%= messages.error %>
-                </div>
-            <% } %>
+        <%- include('partials/errormsg.ejs') %>
         
 
         <form action="/login" method="POST" class="form-signin mt-5">

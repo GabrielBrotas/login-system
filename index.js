@@ -37,6 +37,8 @@ const bcrypt = require('bcryptjs')
     // configurar a sessao
     app.use(passport.session())
 
+    app.use(flash())
+
     // CONFIG do Middleware
         /*
         o middleware pega 3 parametros (request, response, next)
@@ -47,15 +49,12 @@ const bcrypt = require('bcryptjs')
             next()
         */
         app.use( (req, res, next) => {
-            // Variavel para pessoas logadas(permissao), vai armazenar os dados da pessoa logada e, caso nao tenha nenhum usuario logado vai pegar null
+            res.locals.error_msg = req.flash('error_msg')
+            res.locals.success_msg = req.flash('success_msg')
             res.locals.user = req.user || null
             //sempre no final do codigo do middleware vamos colocar o comando next() se nao vai travar a applicacao
             next()
         })
-
-    
-
-    app.use(flash())
 
     app.set('view engine', 'ejs')
     
@@ -94,8 +93,15 @@ app.post('/register', (req, res) => {
 
     var {email, password, passwordConfirm} = req.body
 
-    console.log(email)
-    
+    if(password !== passwordConfirm) {
+        req.flash('error_msg', 'Senhas divergentes')
+        res.redirect('/register')
+    } 
+    if (password.length <= 2 ) {
+        req.flash('error_msg', 'senha muito pequena')
+        res.redirect('/register')
+    }
+
     User.findOne({
         where: {email: email}
     }).then( (user) => {
@@ -109,14 +115,21 @@ app.post('/register', (req, res) => {
                 email:email,
                 password: hash
             }).then( () => {
-                res.redirect('/')
+
+                passport.authenticate('local', {
+                    successRedirect: '/',
+                    failureRedirect: '/login',
+                    failureFlash: true
+                })(req, res, next)
+                
+
             }).catch( (err) => {
                 console.log('err')
                 res.redirect('/')
             })
 
         } else {
-            console.log('email ja cadastrado no sisteme')
+            req.flash('error_msg', 'Esta conta já existe')
             res.redirect('/register')
         }
 
