@@ -41,7 +41,7 @@
 
     6 - Funcao para autenticacao e sessao de usuario apos logar - ok
 
-    7 - ao se cadastrar pedir para confirmar o email - 
+    7 - ao se cadastrar pedir para confirmar o email - ok
 
     8 - autenticacao com redes sociais.. -
 
