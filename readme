@@ -1,0 +1,19 @@
+1 - Criar view principal que vai redirecionar o usuario apos o login
+
+2 - Criar view de registro - OK
+
+3 - Criar view de login - OK
+
+4 - Criar Banco de dados - OK
+    - criar conexao com o banco de dados - ok
+    - criar model/table do db - ok
+
+5 - Funcao para cadastrar novo usuario no db - ok
+
+5 - criar autenticacao e sessao de usuario apos logar - 
+
+6 - ao se cadastrar pedir para confirmar o email
+
+7 - autenticacao com o google gmail
+
+8 - autenticacao com o linkedin e outros...
